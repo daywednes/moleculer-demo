@@ -1,7 +1,6 @@
-version: "3.2"
+version: '3.2'
 
 services:
-
   api:
     build:
       context: .
@@ -14,11 +13,11 @@ services:
     depends_on:
       - nats
     labels:
-      - "traefik.enable=true"
-      - "traefik.backend=api"
-      - "traefik.port=3000"
-      - "traefik.frontend.entryPoints=http"
-      - "traefik.frontend.rule=PathPrefix:/"
+      - 'traefik.enable=true'
+      - 'traefik.backend=api'
+      - 'traefik.port=3000'
+      - 'traefik.frontend.entryPoints=http'
+      - 'traefik.frontend.rule=PathPrefix:/'
     networks:
       - internal
 
@@ -31,7 +30,37 @@ services:
     environment:
       SERVICES: greeter
     labels:
-      - "traefik.enable=false"
+      - 'traefik.enable=false'
+    depends_on:
+      - nats
+    networks:
+      - internal
+
+  greeterReplica:
+    build:
+      context: .
+    image: moleculer-demo
+    container_name: moleculer-demo-greeter-replica
+    env_file: docker-compose.env
+    environment:
+      SERVICES: greeter
+    labels:
+      - 'traefik.enable=false'
+    depends_on:
+      - nats
+    networks:
+      - internal
+
+  helper:
+    build:
+      context: .
+    image: moleculer-demo
+    container_name: moleculer-demo-helper
+    env_file: docker-compose.env
+    environment:
+      SERVICES: helper
+    labels:
+      - 'traefik.enable=false'
     depends_on:
       - nats
     networks:
@@ -40,7 +69,7 @@ services:
   nats:
     image: nats
     labels:
-      - "traefik.enable=false"
+      - 'traefik.enable=false'
     networks:
       - internal
 
@@ -48,13 +77,13 @@ services:
     image: traefik:1.7
     container_name: traefik
     command:
-      - "--api"
-      - "--docker"
-      - "--docker.watch"
+      - '--api'
+      - '--docker'
+      - '--docker.watch'
     labels:
-      - "traefik.enable=true"
-      - "traefik.backend=traefik"
-      - "traefik.port=8080"
+      - 'traefik.enable=true'
+      - 'traefik.backend=traefik'
+      - 'traefik.port=8080'
     ports:
       - 3000:80
       - 3001:8080
